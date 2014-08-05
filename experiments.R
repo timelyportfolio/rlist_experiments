@@ -1,5 +1,5 @@
-devtools::install_github("pipeR","renkun-ken")
-devtools::install_github("rlist","renkun-ken")
+#devtools::install_github("pipeR","renkun-ken")
+#devtools::install_github("rlist","renkun-ken")
 
 require(rlist)
 require(pipeR)
@@ -26,15 +26,27 @@ dt <- list.load(
 list.filter(dt, year == 2000)
 
 # instead need an idea or container for each, so something like this
-dt.nested <- dt %:>%
-  lapply(1:length(.[[1]]),FUN=function(row){
-    l <- names(dt) %>>%
-      lapply(FUN=function(col){
-        dt[[col]][[row]]
-      }) 
-    names(l) <- names(dt)
-    return(l)
-  })
+dt.nested <- dt %>>%
+  {
+    lapply(1:length(.[[1]]),FUN=function(row){
+      l <- names(dt) %>>%
+        lapply(FUN=function(col){
+          dt[[col]][[row]]
+        }) 
+      names(l) <- names(dt)
+      return(l)
+    })
+  }
+
+# or using rlist functions instead
+dt.nested <- dt[[1]] %>>%
+  list.map(
+    f(item,index) -> list.map(
+      dt
+      , .[index]
+    )
+  )
+  
 
 list.filter(dt.nested, year == 2000)
 list.filter(dt.nested, rate > 4)
@@ -42,3 +54,125 @@ list.filter(dt.nested, rate > 4) %>>%
   list.group(year)
 list.filter(dt.nested, rate > 4) %>>%
   list.select("date"=as.Date(paste0(year,"-",month,"-01")),rate)
+
+
+
+
+
+
+
+
+
+devtools::install_github("renkun-ken/rlist@0.3")
+devtools::install_github("renkun-ken/pipeR@0.3")
+library(rlist)
+library(pipeR)
+library(rCharts)
+
+x <- list(
+  p1 = list(name=c("Ken", "Ren"),age=24),
+  p2 = list(name=c("Kent", "Potter"),age=26),
+  p3 = list(name=c("Sam", "Lee"),age=24),
+  p4 = list(name=c("Keynes", "Bond"),age=30),
+  p5 = list(name=c("Kwen", "Hu"),age=31))
+
+list.search(x, any(like("Ken",1)), "character")
+list.search(x, all(!like("Ken",2)), "character")
+list.search(x, all(like(c("Ken","Hu"),2)), "character")
+
+library(pipeR)
+x %>>%
+  list.filter(any(like("Ken",1,name))) %>>%
+  list.mapv(paste(name,collapse = " "))
+
+# do an example with an rCharts object treated as a list
+mtcars %>>%
+  ( data.frame( "car" = rownames(.), ., stringsAsFactors = F ) )  %>>%
+{
+  dPlot(
+    data = .
+    , x = "cyl"
+    , y = "mpg"
+    , groups = c("cyl","mpg","car")
+    , type = "bubble"
+  )
+} %>>%  #probably an unlikely use case for rlist but do it anyways
+{ 
+  list.filter (
+    .$params$data %>>% list.parse()
+    , any( grepl( pattern = "^C", x = . ) )
+  )
+} # same as { list.match(.$params$data %>>% list.parse(), "^C") }
+
+
+
+
+
+
+
+library(dplyr)
+library(hflights)
+library(microbenchmark)
+library(ggplot2)
+
+hflights <- as.data.frame(hflights)
+
+hflights_df <- tbl_df(hflights)
+
+hflights_list <- list.parse( hflights )
+
+mb <- microbenchmark(
+  dplyr_test = filter(hflights_df, Month == 1, DayofMonth == 1)
+  ,df_test = hflights[which(hflights$Month == 1 & hflights$DayofMonth == 1),]
+  ,list_vfilter = hflights_list[ which(hflights$Month == 1 & hflights$DayofMonth == 1) ]
+  ,rlist_test = list.filter(hflights_list, Month == 1 && DayofMonth == 1 )
+  ,List_test = List( hflights_list )$filter(Month == 1 && DayofMonth == 1 )
+  ,lapply_test = list.clean(
+    lapply(hflights_list,function(f){
+      ifelse(f$Month==1 && f$DayofMonth== 1, return(f), return(NULL))
+    })
+  )
+  ,filter_test = Filter(function(f){return( f$Month==1 && f$DayofMonth== 1) },hflights_list)
+  ,times = 10L
+)
+
+autoplot(mb)mb
+
+
+
+
+
+
+# try some rlist on igraphdata  which would be more typical of data
+# on which rlist works wonders
+require(igraph)
+require(igraphdata)
+# data(package="igraphdata")
+# choose foodwebs for no real reason
+data(foodwebs)
+
+# ugly example
+# nest it the way necessary for rlist to read
+fw <- foodwebs$ChesLower[[9]][[3]][[1]] %>>%
+  list.map(
+    f(item,index) -> list.map(
+      foodwebs$ChesLower[[9]][[3]]
+      , .[index]
+    )
+  )
+
+fw %>>%
+  list.match( "^C" )
+
+
+# an ugly join which should approximate
+# get.edgelist(foodwebs$ChesLower)
+foodwebs$ChesLower %>>%
+  get.adjlist %>>%
+  {
+    a <- .
+    list.map(
+      .,
+      sapply(.,function(x){return(names(a)[x])})
+    )
+  }
