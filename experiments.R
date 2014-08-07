@@ -261,11 +261,13 @@ y <- list(
   )
   , list( "aa", "bb" )
 )
-root <- newXMLNode("list_top")
+root <- newXMLNode("list")
 listToXML(root, y)
 doc <- xmlDoc( root )
 
 querySelectorAll(doc,"character")
+xmlToList(root)%>>%list.search(.[equal("^a",pattern=T)])
+
 
 root <- newXMLNode("list_top")
 listToXML(root, fw_l[[9]])
