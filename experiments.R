@@ -161,9 +161,8 @@ fw <- foodwebs$ChesLower[[9]][[3]][[1]] %>>%
     )
   )
 
-fw %>>%
-  list.match( "^C" )
-
+foodwebs$ChesLower[[9]] %>>%
+  list.search( "^C", unlist=T, classes="ANY" )
 
 # an ugly join which should approximate
 # get.edgelist(foodwebs$ChesLower)
@@ -176,3 +175,98 @@ foodwebs$ChesLower %>>%
       sapply(.,function(x){return(names(a)[x])})
     )
   }
+
+fw_l <- foodwebs %>>% unclass
+
+fw_l %>>% 
+  list.search(
+    f(a)->{ grepl( x=a, pattern = "^H" )  }
+    ,unlist=T
+  )
+
+# which is not the same as
+fw_l %>>%
+  rapply(
+    function(a){
+      Filter(
+        function(b){
+          grepl(
+            x = b
+            ,pattern="^H"
+          )
+        }
+        ,a
+      )
+    }
+    ,how="list"
+  )
+
+# now with commit 
+fw_l %>>% list.search(.[equal("^H",pattern=TRUE)], "character")
+
+
+
+
+#### play with xml/xpath/css compared to rlist
+#list to XML
+#only found this stackoverflow
+#http://stackoverflow.com/questions/6256064/how-to-create-xml-from-r-objects-e-g-is-there-a-listtoxml-function
+library(XML)
+#hadley has rvest that uses simon potter's selectr
+#devtools::install_github("hadley/rvest")
+library(rvest)
+
+listToXML <- function(node, sublist){
+  for(i in 1:length(sublist)){
+    child <- newXMLNode(
+      ifelse(
+        is.null(names(sublist)[i]) || names(sublist)[i] == ""
+        ,paste0("unnamed",i)
+        #css does not like leading number
+        ,ifelse(
+          !(is.na(as.numeric(names(sublist)[i])))
+          ,paste0("c",names(sublist)[i])
+          ,names(sublist)[i]
+        )
+      )
+      , parent=node
+      , attrs= list(class = class(sublist[[i]]) )
+    )
+    
+    if (typeof(sublist[[i]]) == "list"){
+      listToXML(child, sublist[[i]])
+    }
+    
+    else{
+      sapply(
+        sublist[[i]],
+        function(d){
+          child2 <- newXMLNode( class(d), parent = child )
+          xmlValue(child2) <- d
+        }
+      )
+    }
+  } 
+}
+
+#use the nested y list from test-list.search.R
+y <- list(
+  n = 1:10
+  , list(
+    df = data.frame(
+      id = 1:10
+      , letter = letters[1:10]
+      , stringsAsFactors = F
+    ) %>>% list.parse
+  )
+  , list( "aa", "bb" )
+)
+root <- newXMLNode("list_top")
+listToXML(root, y)
+doc <- xmlDoc( root )
+
+querySelectorAll(doc,"character")
+
+root <- newXMLNode("list_top")
+listToXML(root, fw_l[[9]])
+doc <- xmlDoc( root )
