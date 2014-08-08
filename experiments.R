@@ -272,3 +272,37 @@ xmlToList(root)%>>%list.search(.[equal("^a",pattern=T)])
 root <- newXMLNode("list_top")
 listToXML(root, fw_l[[9]])
 doc <- xmlDoc( root )
+
+
+#more with xml
+doc <- xmlParse(system.file("exampleData", "mtcars.xml", package="XML"))
+
+r <- xmlRoot(doc)
+
+xmlSApply(r, xmlValue) %>>% data.frame
+
+xmlApply(r, xmlAttrs)
+
+xmlSApply(r, xmlSize)
+
+doc %>>% querySelectorAll("record") %>>%
+  xmlApply(xmlValue) %>>%
+  list.map(strsplit(.,"\\s{1,}") %>>% unlist %>>% t %>>% data.frame) %>>%
+  list.stack
+
+
+
+
+
+#play with d3Network
+#devtools::install_github('christophergandrud/d3Network')
+#see http://edbaskerville.com/research/serengeti-food-web/#
+library(d3Network)
+#unfortunately doesn't work because d3network does not transform data
+d3Tree(fw_l, file = "d3tree_foodweb.html")
+
+
+foodwebs$ChesLower %>>%
+  get.edgelist %>>%
+  {structure( data.frame(.), names  = c("Target","Source") )} %>>%
+  d3SimpleNetwork( file = "simplenetwork.html" )

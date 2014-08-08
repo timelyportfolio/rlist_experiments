@@ -1,0 +1,132 @@
+
+        <!DOCTYPE html>
+        <meta charset="utf-8">
+        <body> 
+ <style>
+.link {
+stroke: #666;
+opacity: 0.6;
+stroke-width: 1.5px;
+}
+.node circle {
+stroke: #fff;
+opacity: 0.6;
+stroke-width: 1.5px;
+}
+text {
+font: 7px serif;
+opacity: 0.6;
+pointer-events: none;
+}
+</style>
+
+<script src=http://d3js.org/d3.v3.min.js></script>
+
+<script> 
+ var links = [ { "source" : "Input", "target" : "Net Phytoplankton" }, { "source" : "Input", "target" : "Picoplankton" }, { "source" : "Input", "target" : "Microphytobenthos" }, { "source" : "Input", "target" : "SAV" }, { "source" : "Input", "target" : "Oysters" }, { "source" : "Input", "target" : "Blue Crab" }, { "source" : "Input", "target" : "Herrings and Shads" }, { "source" : "Input", "target" : "White Perch" }, { "source" : "Input", "target" : "Spot" }, { "source" : "Input", "target" : "American eel" }, { "source" : "Input", "target" : "Catfish" }, { "source" : "Input", "target" : "DOC" }, { "source" : "Input", "target" : "Sediment POC" }, { "source" : "Oysters", "target" : "Output" }, { "source" : "Blue Crab", "target" : "Output" }, { "source" : "Menhaden", "target" : "Output" }, { "source" : "Bay anchovy", "target" : "Output" }, { "source" : "Herrings and Shads", "target" : "Output" }, { "source" : "White Perch", "target" : "Output" }, { "source" : "Spot", "target" : "Output" }, { "source" : "Croaker", "target" : "Output" }, { "source" : "Catfish", "target" : "Output" }, { "source" : "American eel", "target" : "Output" }, { "source" : "Striped Bass", "target" : "Output" }, { "source" : "Bluefish", "target" : "Output" }, { "source" : "Weakfish", "target" : "Output" }, { "source" : "DOC", "target" : "Output" }, { "source" : "Sediment POC", "target" : "Output" }, { "source" : "POC", "target" : "Output" }, { "source" : "Net Phytoplankton", "target" : "Respiration" }, { "source" : "Picoplankton", "target" : "Respiration" }, { "source" : "Free Bacteria", "target" : "Respiration" }, { "source" : "Particle Attached Bacteria", "target" : "Respiration" }, { "source" : "Heteroflagellates", "target" : "Respiration" }, { "source" : "Ciliates", "target" : "Respiration" }, { "source" : "Rotifers", "target" : "Respiration" }, { "source" : "Meroplankton", "target" : "Respiration" }, { "source" : "Mesozooplankton", "target" : "Respiration" }, { "source" : "Ctenophores", "target" : "Respiration" }, { "source" : "Chrysaora", "target" : "Respiration" }, { "source" : "Microphytobenthos", "target" : "Respiration" }, { "source" : "SAV", "target" : "Respiration" }, { "source" : "Benthic Bacteria", "target" : "Respiration" }, { "source" : "Meiofauna", "target" : "Respiration" }, { "source" : "Deposit Feeding Benthos", "target" : "Respiration" }, { "source" : "Suspension Feeding Benthos", "target" : "Respiration" }, { "source" : "Oysters", "target" : "Respiration" }, { "source" : "Blue Crab", "target" : "Respiration" }, { "source" : "Menhaden", "target" : "Respiration" }, { "source" : "Bay anchovy", "target" : "Respiration" }, { "source" : "Herrings and Shads", "target" : "Respiration" }, { "source" : "White Perch", "target" : "Respiration" }, { "source" : "Spot", "target" : "Respiration" }, { "source" : "Croaker", "target" : "Respiration" }, { "source" : "Hogchoker", "target" : "Respiration" }, { "source" : "American eel", "target" : "Respiration" }, { "source" : "Catfish", "target" : "Respiration" }, { "source" : "Striped Bass", "target" : "Respiration" }, { "source" : "Bluefish", "target" : "Respiration" }, { "source" : "Weakfish", "target" : "Respiration" }, { "source" : "DOC", "target" : "Respiration" }, { "source" : "Sediment POC", "target" : "Respiration" }, { "source" : "POC", "target" : "Respiration" }, { "source" : "Net Phytoplankton", "target" : "Ciliates" }, { "source" : "Net Phytoplankton", "target" : "Rotifers" }, { "source" : "Net Phytoplankton", "target" : "Meroplankton" }, { "source" : "Net Phytoplankton", "target" : "Mesozooplankton" }, { "source" : "Net Phytoplankton", "target" : "Suspension Feeding Benthos" }, { "source" : "Net Phytoplankton", "target" : "Menhaden" }, { "source" : "Net Phytoplankton", "target" : "DOC" }, { "source" : "Net Phytoplankton", "target" : "POC" }, { "source" : "Picoplankton", "target" : "Ciliates" }, { "source" : "Picoplankton", "target" : "Meroplankton" }, { "source" : "Picoplankton", "target" : "Mesozooplankton" }, { "source" : "Picoplankton", "target" : "Suspension Feeding Benthos" }, { "source" : "Picoplankton", "target" : "DOC" }, { "source" : "Picoplankton", "target" : "POC" }, { "source" : "Free Bacteria", "target" : "Heteroflagellates" }, { "source" : "Free Bacteria", "target" : "Ciliates" }, { "source" : "Free Bacteria", "target" : "DOC" }, { "source" : "Free Bacteria", "target" : "POC" }, { "source" : "Particle Attached Bacteria", "target" : "Suspension Feeding Benthos" }, { "source" : "Particle Attached Bacteria", "target" : "DOC" }, { "source" : "Particle Attached Bacteria", "target" : "POC" }, { "source" : "Heteroflagellates", "target" : "Ciliates" }, { "source" : "Heteroflagellates", "target" : "DOC" }, { "source" : "Heteroflagellates", "target" : "POC" }, { "source" : "Ciliates", "target" : "Meroplankton" }, { "source" : "Ciliates", "target" : "Mesozooplankton" }, { "source" : "Ciliates", "target" : "Bay anchovy" }, { "source" : "Ciliates", "target" : "DOC" }, { "source" : "Ciliates", "target" : "POC" }, { "source" : "Meroplankton", "target" : "Ctenophores" }, { "source" : "Meroplankton", "target" : "Menhaden" }, { "source" : "Meroplankton", "target" : "Bay anchovy" }, { "source" : "Meroplankton", "target" : "DOC" }, { "source" : "Meroplankton", "target" : "POC" }, { "source" : "Mesozooplankton", "target" : "Mesozooplankton" }, { "source" : "Mesozooplankton", "target" : "Ctenophores" }, { "source" : "Mesozooplankton", "target" : "Menhaden" }, { "source" : "Mesozooplankton", "target" : "Bay anchovy" }, { "source" : "Mesozooplankton", "target" : "DOC" }, { "source" : "Mesozooplankton", "target" : "POC" }, { "source" : "Ctenophores", "target" : "Chrysaora" }, { "source" : "Ctenophores", "target" : "DOC" }, { "source" : "Ctenophores", "target" : "POC" }, { "source" : "Microphytobenthos", "target" : "Meiofauna" }, { "source" : "Microphytobenthos", "target" : "Deposit Feeding Benthos" }, { "source" : "Microphytobenthos", "target" : "DOC" }, { "source" : "Microphytobenthos", "target" : "Sediment POC" }, { "source" : "SAV", "target" : "Sediment POC" }, { "source" : "Benthic Bacteria", "target" : "Meiofauna" }, { "source" : "Benthic Bacteria", "target" : "Deposit Feeding Benthos" }, { "source" : "Benthic Bacteria", "target" : "DOC" }, { "source" : "Benthic Bacteria", "target" : "Sediment POC" }, { "source" : "Meiofauna", "target" : "Deposit Feeding Benthos" }, { "source" : "Meiofauna", "target" : "Blue Crab" }, { "source" : "Meiofauna", "target" : "Spot" }, { "source" : "Meiofauna", "target" : "Croaker" }, { "source" : "Meiofauna", "target" : "Hogchoker" }, { "source" : "Meiofauna", "target" : "Sediment POC" }, { "source" : "Deposit Feeding Benthos", "target" : "Blue Crab" }, { "source" : "Deposit Feeding Benthos", "target" : "Spot" }, { "source" : "Deposit Feeding Benthos", "target" : "Croaker" }, { "source" : "Deposit Feeding Benthos", "target" : "Hogchoker" }, { "source" : "Deposit Feeding Benthos", "target" : "Striped Bass" }, { "source" : "Deposit Feeding Benthos", "target" : "Weakfish" }, { "source" : "Deposit Feeding Benthos", "target" : "DOC" }, { "source" : "Deposit Feeding Benthos", "target" : "Sediment POC" }, { "source" : "Suspension Feeding Benthos", "target" : "Blue Crab" }, { "source" : "Suspension Feeding Benthos", "target" : "Spot" }, { "source" : "Suspension Feeding Benthos", "target" : "Croaker" }, { "source" : "Suspension Feeding Benthos", "target" : "Hogchoker" }, { "source" : "Suspension Feeding Benthos", "target" : "Striped Bass" }, { "source" : "Suspension Feeding Benthos", "target" : "Weakfish" }, { "source" : "Suspension Feeding Benthos", "target" : "DOC" }, { "source" : "Suspension Feeding Benthos", "target" : "Sediment POC" }, { "source" : "Blue Crab", "target" : "Striped Bass" }, { "source" : "Blue Crab", "target" : "Sediment POC" }, { "source" : "Menhaden", "target" : "Striped Bass" }, { "source" : "Menhaden", "target" : "Bluefish" }, { "source" : "Menhaden", "target" : "Weakfish" }, { "source" : "Menhaden", "target" : "DOC" }, { "source" : "Menhaden", "target" : "Sediment POC" }, { "source" : "Menhaden", "target" : "POC" }, { "source" : "Bay anchovy", "target" : "Striped Bass" }, { "source" : "Bay anchovy", "target" : "Bluefish" }, { "source" : "Bay anchovy", "target" : "Weakfish" }, { "source" : "Bay anchovy", "target" : "Sediment POC" }, { "source" : "Bay anchovy", "target" : "POC" }, { "source" : "Spot", "target" : "Striped Bass" }, { "source" : "Spot", "target" : "Bluefish" }, { "source" : "Spot", "target" : "Weakfish" }, { "source" : "Spot", "target" : "DOC" }, { "source" : "Spot", "target" : "POC" }, { "source" : "Croaker", "target" : "Bluefish" }, { "source" : "Croaker", "target" : "DOC" }, { "source" : "Croaker", "target" : "POC" }, { "source" : "Hogchoker", "target" : "DOC" }, { "source" : "Hogchoker", "target" : "POC" }, { "source" : "Striped Bass", "target" : "DOC" }, { "source" : "Striped Bass", "target" : "POC" }, { "source" : "Bluefish", "target" : "DOC" }, { "source" : "Bluefish", "target" : "POC" }, { "source" : "Weakfish", "target" : "DOC" }, { "source" : "Weakfish", "target" : "POC" }, { "source" : "DOC", "target" : "Free Bacteria" }, { "source" : "Sediment POC", "target" : "Benthic Bacteria" }, { "source" : "Sediment POC", "target" : "Meiofauna" }, { "source" : "Sediment POC", "target" : "Deposit Feeding Benthos" }, { "source" : "Sediment POC", "target" : "Blue Crab" }, { "source" : "POC", "target" : "Particle Attached Bacteria" }, { "source" : "POC", "target" : "Meroplankton" }, { "source" : "POC", "target" : "Mesozooplankton" }, { "source" : "POC", "target" : "Suspension Feeding Benthos" }, { "source" : "POC", "target" : "Menhaden" }, { "source" : "POC", "target" : "Bay anchovy" }, { "source" : "POC", "target" : "Sediment POC" } ] ; 
+ var nodes = {}
+
+// Compute the distinct nodes from the links.
+links.forEach(function(link) {
+link.source = nodes[link.source] ||
+(nodes[link.source] = {name: link.source});
+link.target = nodes[link.target] ||
+(nodes[link.target] = {name: link.target});
+link.value = +link.value;
+});
+
+var width = 900
+height = 600;
+
+var force = d3.layout.force()
+.nodes(d3.values(nodes))
+.links(links)
+.size([width, height])
+.linkDistance(50)
+.charge(-200)
+.on("tick", tick)
+.start();
+
+var svg = d3.select("body").append("svg")
+.attr("width", width)
+.attr("height", height);
+
+var link = svg.selectAll(".link")
+.data(force.links())
+.enter().append("line")
+.attr("class", "link");
+
+var node = svg.selectAll(".node")
+.data(force.nodes())
+.enter().append("g")
+.attr("class", "node")
+.on("mouseover", mouseover)
+.on("mouseout", mouseout)
+.on("click", click)
+.on("dblclick", dblclick)
+.call(force.drag);
+
+node.append("circle")
+.attr("r", 8)
+.style("fill", "#3182bd");
+
+node.append("text")
+.attr("x", 12)
+.attr("dy", ".35em")
+.style("fill", "#3182bd")
+.text(function(d) { return d.name; });
+
+function tick() {
+link
+.attr("x1", function(d) { return d.source.x; })
+.attr("y1", function(d) { return d.source.y; })
+.attr("x2", function(d) { return d.target.x; })
+.attr("y2", function(d) { return d.target.y; });
+
+node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+}
+
+function mouseover() {
+d3.select(this).select("circle").transition()
+.duration(750)
+.attr("r", 16);
+}
+
+function mouseout() {
+d3.select(this).select("circle").transition()
+.duration(750)
+.attr("r", 8);
+}
+// action to take on mouse click
+function click() {
+d3.select(this).select("text").transition()
+.duration(750)
+.attr("x", 22)
+.style("stroke-width", ".5px")
+.style("opacity", 1)
+.style("fill", "#E34A33")
+.style("font", "17.5px serif");
+d3.select(this).select("circle").transition()
+.duration(750)
+.style("fill", "#E34A33")
+.attr("r", 16)
+}
+
+// action to take on mouse double click
+function dblclick() {
+d3.select(this).select("circle").transition()
+.duration(750)
+.attr("r", 6)
+.style("fill", "#E34A33");
+d3.select(this).select("text").transition()
+.duration(750)
+.attr("x", 12)
+.style("stroke", "none")
+.style("fill", "#E34A33")
+.style("stroke", "none")
+.style("opacity", 0.6)
+.style("font", "7px serif");
+}
+
+</script>
+ </body>
